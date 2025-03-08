@@ -38,7 +38,7 @@ Your objective is to extract transaction data from the image files, compare it w
 
 3. Prepare CSV data:
    - Create a list of transactions with the following columns in this exact order:
-     a. data (date)
+     a. data (date) always in format YYYY.MM.DD (eg. 2024.01.01)
      b. od (from)
      c. do (to)
      d. suma przelewu (transfer amount)
@@ -87,7 +87,7 @@ def extract_text_from_pdf(pdf_path):
     except Exception as e:
         return f"Błąd podczas ekstrakcji tekstu: {str(e)}"
 
-def convert_pdf_to_images(pdf_path, max_pages=5):
+def convert_pdf_to_images(pdf_path, max_pages=100):
     try:
         # Konwertuj PDF na obrazy
         images = convert_from_path(pdf_path, dpi=150, first_page=1, last_page=max_pages)
