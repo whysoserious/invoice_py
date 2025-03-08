@@ -38,7 +38,7 @@ Your objective is to extract transaction data from the image files, compare it w
 
 3. Prepare CSV data:
    - Create a list of transactions with the following columns in this exact order:
-     a. data (date) always in format YYYY.MM.DD (eg. 2024.01.01)
+     a. data (date) always in format YYYY-MM-DD (eg. 2024-01-01)
      b. od (from)
      c. do (to)
      d. suma przelewu (transfer amount)
