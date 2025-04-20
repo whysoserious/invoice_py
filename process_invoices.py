@@ -65,17 +65,9 @@ def convert_pdf_to_images(pdf_path, max_pages=100):
         # Convert PDF to images
         images = convert_from_path(pdf_path, dpi=150, first_page=1, last_page=max_pages)
         
-        # Prepare base filename for images
-        base_filename = os.path.splitext(pdf_path)[0]
-        
-        # Convert images to base64 and save them to disk
+        # Convert images to base64 without saving to disk
         image_base64_list = []
         for i, image in enumerate(images):
-            # Save image to disk
-            image_filename = f"{base_filename}_generated_{i+1}.jpg"
-            image.save(image_filename, "JPEG", quality=85)
-            print(f"Image saved: {image_filename}")
-            
             # Compress and convert to base64 for Claude
             buffered = io.BytesIO()
             image.save(buffered, format="JPEG", quality=85)
@@ -106,13 +98,13 @@ def send_to_claude(pdf_path, parsed_text, api_key):
             print(error_message)
             return error_message
         
-        # Prepare list of image filenames
+        # Create virtual image references
         base_filename = os.path.splitext(os.path.basename(pdf_path))[0]
         image_files_list = []
         for i in range(len(image_base64_list)):
-            image_files_list.append(f"{base_filename}_generated_{i+1}.jpg")
+            image_files_list.append(f"{base_filename}_image_{i+1}.jpg")
         
-        # Prepare prompt with list of image files
+        # Prepare prompt with list of virtual image files
         image_files_text = "\n".join(image_files_list)
         modified_prompt = prompt.replace("{{IMAGE_FILES}}", image_files_text)
         modified_prompt = modified_prompt.replace("{{PARSED_TEXT}}", parsed_text)
@@ -211,12 +203,13 @@ def extract_csv_from_response(response):
         return "No CSV data found in the response."
 
 def main():
-    parser = argparse.ArgumentParser(description='Process invoices from the specified folder.')
-    parser.add_argument('--folder', '-f', required=True, help='Folder containing invoices')
+    parser = argparse.ArgumentParser(description='Process invoices from the specified files or folder.')
+    parser.add_argument('--folder', '-f', help='Folder containing invoices')
+    parser.add_argument('--file', help='Path to a specific PDF file to process')
+    parser.add_argument('--files', nargs='+', help='List of PDF files to process')
     parser.add_argument('--api-key', '-k', required=True, help='API key for processing invoices')
     
     args = parser.parse_args()
-    folder_name = args.folder
     api_key = args.api_key
     
     if api_key:
@@ -225,53 +218,98 @@ def main():
         print("No API key provided. Cannot process files.")
         sys.exit(1)
     
-    # Check if folder exists
-    if not os.path.isdir(folder_name):
-        print(f"Error: Folder '{folder_name}' does not exist!")
-        sys.exit(1)
-    
-    print(f"Specified folder: {folder_name}")
-    print(f"Folder exists and is accessible.")
-    
-    # List PDF files
-    print("\nFound PDF files:")
-    found_pdf = False
-    
-    for filename in os.listdir(folder_name):
-        file_path = os.path.join(folder_name, filename)
+    # Process a single file
+    if args.file:
+        if not os.path.isfile(args.file):
+            print(f"Error: File '{args.file}' does not exist!")
+            sys.exit(1)
         
-        # Check only files (skip subfolders)
-        if os.path.isfile(file_path):
-            if filename.lower().endswith('.pdf'):
-                print(f"- {filename}")
-                found_pdf = True
-                
-                # Extract text from PDF
-                print(f"\nExtracting text from file: {filename}")
-                parsed_text = extract_text_from_pdf(file_path)
-                print("-" * 40)
-                print(parsed_text[:50] + "..." if len(parsed_text) > 50 else parsed_text)
-                print("-" * 40)
-                
-                # Send to Claude
-                print(f"\nSending file {filename} to Claude API...")
-                csv_result = send_to_claude(file_path, parsed_text, api_key)
-                
-                # Save result to CSV file
-                csv_filename = os.path.splitext(filename)[0] + ".csv"
-                csv_path = os.path.join(folder_name, csv_filename)
-                with open(csv_path, 'w', encoding='utf-8') as csv_file:
-                    csv_file.write(csv_result)
-                
-                print(f"Result saved to file: {csv_filename}")
-                print("-" * 40)
-                print(csv_result[:1000] + "..." if len(csv_result) > 1000 else csv_result)
-                print("-" * 40)
-            else:
-                print(f"Ignoring file: {filename} (not a PDF file)")
+        if not args.file.lower().endswith('.pdf'):
+            print(f"Error: File '{args.file}' is not a PDF file!")
+            sys.exit(1)
+            
+        process_file(args.file, api_key)
+        return
     
-    if not found_pdf:
-        print("No PDF files found in the specified folder.")
+    # Process a list of files
+    if args.files:
+        found_pdf = False
+        for file_path in args.files:
+            if not os.path.isfile(file_path):
+                print(f"Warning: File '{file_path}' does not exist! Skipping.")
+                continue
+                
+            if not file_path.lower().endswith('.pdf'):
+                print(f"Warning: File '{file_path}' is not a PDF file! Skipping.")
+                continue
+                
+            process_file(file_path, api_key)
+            found_pdf = True
+            
+        if not found_pdf:
+            print("No valid PDF files found in the provided list.")
+        return
+    
+    # Process all files in a folder
+    if args.folder:
+        folder_name = args.folder
+        
+        # Check if folder exists
+        if not os.path.isdir(folder_name):
+            print(f"Error: Folder '{folder_name}' does not exist!")
+            sys.exit(1)
+        
+        print(f"Specified folder: {folder_name}")
+        print(f"Folder exists and is accessible.")
+        
+        # List PDF files
+        print("\nFound PDF files:")
+        found_pdf = False
+        
+        for filename in os.listdir(folder_name):
+            file_path = os.path.join(folder_name, filename)
+            
+            # Check only files (skip subfolders)
+            if os.path.isfile(file_path):
+                if filename.lower().endswith('.pdf'):
+                    print(f"- {filename}")
+                    found_pdf = True
+                    process_file(file_path, api_key)
+                else:
+                    print(f"Ignoring file: {filename} (not a PDF file)")
+        
+        if not found_pdf:
+            print("No PDF files found in the specified folder.")
+        return
+    
+    print("Error: You must specify either --folder, --file, or --files")
+    sys.exit(1)
+    
+def process_file(file_path, api_key):
+    filename = os.path.basename(file_path)
+    folder_name = os.path.dirname(file_path)
+    
+    # Extract text from PDF
+    print(f"\nExtracting text from file: {filename}")
+    parsed_text = extract_text_from_pdf(file_path)
+    print("-" * 40)
+    print(parsed_text[:50] + "..." if len(parsed_text) > 50 else parsed_text)
+    print("-" * 40)
+    
+    # Send to Claude
+    print(f"\nSending file {filename} to Claude API...")
+    csv_result = send_to_claude(file_path, parsed_text, api_key)
+    
+    # Save result to CSV file
+    csv_filename = os.path.splitext(filename)[0] + ".csv"
+    csv_path = os.path.join(folder_name, csv_filename)
+    with open(csv_path, 'w', encoding='utf-8') as csv_file:
+        csv_file.write(csv_result)
+    
+    print(f"Result saved to file: {csv_filename}")
+    print("-" * 40)
+    print(csv_result[:1000] + "..." if len(csv_result) > 1000 else csv_result)
+    print("-" * 40)
 
 if __name__ == "__main__":
     main()
