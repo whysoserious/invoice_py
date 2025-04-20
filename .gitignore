@@ -1,3 +1,8 @@
 wyciągi/
 notes.txt
 test.*
+**/CLAUDE.local.md
+__pycache__/i
+docs/
+test_kantor/
+tests/
