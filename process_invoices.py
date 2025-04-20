@@ -11,64 +11,37 @@ from pdf2image import convert_from_path
 from PIL import Image
 
 # AI model prompt definition
-prompt = """You are an advanced AI assistant specializing in financial data extraction and processing. Your task is to create an accurate transaction history in CSV format based on the provided data. This task requires extreme precision and attention to detail.
+prompt = """Extract bank transaction data from these inputs and generate a CSV file:
 
-You will be working with the following inputs:
-
-1. A list of image files containing transaction data:
+Images with transaction data:
 <image_files>
 {{IMAGE_FILES}}
 </image_files>
 
-2. Parsed text data for comparison:
+Parsed text for verification:
 <parsed_text>
 {{PARSED_TEXT}}
 </parsed_text>
 
-Your objective is to extract transaction data from the image files, compare it with the parsed text, and generate a CSV file with the transaction history. Follow these steps carefully:
+Instructions:
+- Extract transaction details from images and compare with the parsed text
+- Create a list of transactions with these columns in this exact order:
+  a. data (date) in YYYY-MM-DD format
+  b. od (from account)
+  c. do (to account)
+  d. suma przelewu (transfer amount)
+  e. saldo przed (balance before)
+  f. saldo po (balance after)
+  g. opis transakcji (transaction description)
+- Present CSV data in <csv_output> tags with comma separators
 
-1. Analyze the image files:
-   - Extract all transaction details from each image file.
-   - Be aware that a single transaction may span across multiple image files.
-   - Pay close attention to dates, account numbers, amounts, and transaction descriptions.
-
-2. Compare extracted data:
-   - Carefully compare the data you've extracted from the images with the information in the parsed text.
-   - If there are any discrepancies, use your judgment to determine which source is more likely to be accurate.
-
-3. Prepare CSV data:
-   - Create a list of transactions with the following columns in this exact order:
-     a. data (date) always in format YYYY-MM-DD (eg. 2024-01-01)
-     b. od (from)
-     c. do (to)
-     d. suma przelewu (transfer amount)
-     e. saldo przed (balance before)
-     f. saldo po (balance after)
-     g. opis transakcji (transaction description)
-
-4. Generate CSV output:
-   - Present the final CSV data in <csv_output> tags. Use ',' as a separator.
-
-Before providing your final output, wrap your thought process in <analysis> tags inside your thinking block. Include the following steps:
-
-1. List each image file and the key transaction details extracted from it.
-2. Create a comparison table showing the extracted data vs the parsed text data.
-3. Note any discrepancies and explain your reasoning for resolving them.
-4. Show a sample of how you're formatting the data for the CSV output.
-
-This breakdown will help maintain the highest level of accuracy throughout the task. It's OK for this section to be quite long.
-
-Example of the desired CSV output structure:
-
+Example output format:
 <csv_output>
 data,od,do,suma przelewu,saldo przed,saldo po,opis transakcji
 2023-05-01,123456789,987654321,1000.00,5000.00,4000.00,Payment for services
-2023-05-02,987654321,123456789,500.00,4000.00,4500.00,Refund
 </csv_output>
 
-Remember to maintain the utmost accuracy and attention to detail throughout this process. Double-check your work to ensure all data has been correctly extracted, compared, and recorded in the CSV format as specified.
-
-Your final output should consist only of the CSV data in the <csv_output> tags and should not duplicate or rehash any of the work you did in the analysis section.
+Return ONLY the CSV data in <csv_output> tags. Do not include any explanations.
 """
 
 def extract_text_from_pdf(pdf_path):  
