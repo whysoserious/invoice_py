@@ -6,3 +6,4 @@ __pycache__/i
 docs/
 test_kantor/
 tests/
+__pycache__/
