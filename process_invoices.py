@@ -47,7 +47,7 @@ Your objective is to extract transaction data from the image files, compare it w
      g. opis transakcji (transaction description)
 
 4. Generate CSV output:
-   - Present the final CSV data in <csv_output> tags.
+   - Present the final CSV data in <csv_output> tags. Use ',' as a separator.
 
 Before providing your final output, wrap your thought process in <analysis> tags inside your thinking block. Include the following steps:
 
