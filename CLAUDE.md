@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 - Run script: `python process_invoices.py --folder <folder_path> --api-key <anthropic_api_key>`
 - Environment setup: `python -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
+- Compile check: `python3 -m py_compile process_invoices.py && echo "Compilation successful - no syntax errors"`
 - Format code: `black *.py`
 - Lint code: `flake8 *.py`
 
