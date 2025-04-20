@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Compile check: `python3 -m py_compile process_invoices.py && echo "Compilation successful - no syntax errors"`
 - Format code: `black *.py`
 - Lint code: `flake8 *.py`
+- Cleanup: `find test_kantor/ -name "*.jpg" -o -name "*.csv" -type f -delete`
 
 ## Code Style Guidelines
 - Use PEP 8 style guidelines for Python code
