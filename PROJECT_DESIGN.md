@@ -1,6 +1,6 @@
 ### **Dokument Projektowy: Automatyczny Procesor Faktur i Wyciągów Bankowych**
 
-**Wersja:** 1.4
+**Wersja:** 1.5
 **Data:** 13.07.2025
 **Autor:** Gemini
 
@@ -14,10 +14,11 @@
 
 *   **Ekstrakcja Danych z PDF:** Przetwarzanie plików PDF, obsługa jednego pliku, listy plików lub całego folderu.
 *   **Integracja z AI:** Wykorzystanie API Google Gemini do analizy wizualnej i tekstowej dokumentów.
-*   **[NOWOŚĆ] Wsparcie dla Wielu Formatów Wyjściowych:** Możliwość generowania wyników w formacie `.csv` lub `.json` na podstawie wyboru użytkownika.
-*   **[NOWOŚĆ] Inteligentna Kategoryzacja Transakcji:** Automatyczne przypisywanie transakcji do predefiniowanych kategorii na podstawie analizy AI oraz reguł zdefiniowanych przez użytkownika.
-*   **[NOWOŚĆ] Interaktywny Tryb Weryfikacji:** Opcjonalny tryb, w którym aplikacja prosi użytkownika o potwierdzenie transakcji o niskim poziomie pewności.
-*   **[NOWOŚĆ] Zaawansowane Logowanie i Raportowanie:** Prowadzenie pliku `log` z przebiegu operacji i generowanie podsumowania po zakończeniu pracy.
+*   **Wsparcie dla Wielu Formatów Wyjściowych:** Możliwość generowania wyników w formacie `.csv` lub `.json` na podstawie wyboru użytkownika.
+*   **Inteligentna Kategoryzacja Transakcji:** Automatyczne przypisywanie transakcji do predefiniowanych kategorii na podstawie analizy AI oraz reguł zdefiniowanych przez użytkownika.
+*   **Interaktywny Tryb Weryfikacji:** Opcjonalny tryb, w którym aplikacja prosi użytkownika o potwierdzenie transakcji o niskim poziomie pewności.
+*   **Zaawansowane Logowanie i Raportowanie:** Prowadzenie pliku `log` z przebiegu operacji i generowanie podsumowania po zakończeniu pracy.
+*   **[NOWOŚĆ] Dokumentacja Projektu:** Wygenerowanie pliku `README.md` z kompleksową instrukcją instalacji, konfiguracji i użytkowania.
 
 #### 3. Wymagania Funkcjonalne
 
@@ -37,6 +38,8 @@
 6.  **Logowanie:**
     *   Wszystkie operacje (odczyt pliku, zapytanie do API, zapis wyniku, błędy) są zapisywane w pliku `processing.log`.
     *   Po zakończeniu na konsoli wyświetlane jest zwięzłe podsumowanie.
+7.  **[NOWOŚĆ] Generowanie Dokumentacji:**
+    *   Stworzenie pliku `README.md` zawierającego: ogólny opis projektu, instrukcje instalacji zależności (`pip`, `poppler`), opis wszystkich argumentów CLI, przykłady użycia oraz wyjaśnienie formatu pliku z regułami (`rules.yaml`).
 
 #### 4. Architektura i Projekt Techniczny
 
